@@ -65,8 +65,177 @@ Using Postman as your control plane, teams can publish HTML pages and JavaScript
 
 ---
 
-If you want, I can also generate:
 
-* a **one-page marketing slick** (headline, problem/solution, ROI stats placeholders, use-case tiles), or
-* a **sample Postman collection JSON** that includes `PUT /pages/{id}`, `PUT /workflows/{id}`, and `GET /pages/{id}` with environment variables and tests.
+Below is a **detailed, end-to-end Mermaid diagram** you can drop directly into your GitHub README or docs. It shows **Postman → HTML/JS Pages → JSON Workflow → API orchestration → Observability**, aligned with your marketing narrative.
 
+---
+
+## High-Level Architecture + Runtime Flow (Mermaid)
+
+```mermaid
+flowchart LR
+    %% ===== Actors =====
+    User["End User / Client"]
+    SE["Solution Engineer / Ops / Product"]
+    
+    %% ===== Control Plane =====
+    subgraph CP["Postman Control Plane"]
+        PC["Postman Collections"]
+        PE["Postman Environments<br/>(Tenant, Keys, URLs)"]
+        PT["Postman Tests<br/>(Schema & Guardrails)"]
+    end
+
+    %% ===== Delivery Platform =====
+    subgraph UI["Configurable Web Runtime"]
+        Page["HTML Page<br/>(Dynamic UI)"]
+        JS["JavaScript API Connector"]
+    end
+
+    %% ===== Workflow Engine =====
+    subgraph WF["Workflow Engine (Workflow-as-JSON)"]
+        Trigger["HTTP Trigger"]
+        Validate["Validate Input<br/>(Schema / Rules)"]
+        Route["Tenant Routing<br/>(Rules & Flags)"]
+        Transform["Transform & Enrich Payload"]
+        Orchestrate["API Orchestration"]
+        Retry["Retry / Backoff Logic"]
+        Fallback["Fallback / Async Accept"]
+        Response["UI-Ready Response"]
+    end
+
+    %% ===== Backend APIs =====
+    subgraph APIs["Backend Systems"]
+        API1["Core API"]
+        API2["Partner / External API"]
+        API3["Data / Workflow API"]
+    end
+
+    %% ===== Observability =====
+    subgraph OBS["Observability & Governance"]
+        Logs["Structured Logs"]
+        Metrics["Metrics"]
+        Traces["Distributed Tracing"]
+        Audit["Audit & Versioning"]
+    end
+
+    %% ===== Flows =====
+    User --> Page
+    Page --> JS
+    JS --> Trigger
+
+    SE --> PC
+    SE --> PE
+    SE --> PT
+
+    PC -->|Publish Pages & Workflows| Page
+    PC -->|Publish Workflows| WF
+    PE -->|Inject Config| JS
+    PT -->|Validate Before Publish| PC
+
+    Trigger --> Validate
+    Validate -->|Valid| Route
+    Validate -->|Invalid| Response
+
+    Route --> Transform
+    Transform --> Orchestrate
+
+    Orchestrate --> API1
+    Orchestrate --> API2
+    Orchestrate --> API3
+
+    API1 --> Orchestrate
+    API2 --> Orchestrate
+    API3 --> Orchestrate
+
+    Orchestrate -->|Success| Response
+    Orchestrate -->|Failure| Retry
+    Retry -->|Exhausted| Fallback
+    Fallback --> Response
+
+    Response --> Page
+
+    %% ===== Observability Hooks =====
+    WF --> Logs
+    WF --> Metrics
+    WF --> Traces
+    PC --> Audit
+```
+
+---
+
+## How to Explain This Diagram (README-Ready)
+
+### 1️⃣ Control Plane (Postman)
+
+Postman acts as the **publishing, governance, and configuration layer**.
+Teams use collections to deploy:
+
+* HTML pages
+* JavaScript API connectors
+* JSON workflow definitions
+
+Environments control **tenant routing, API keys, and URLs**, while tests enforce guardrails before changes go live.
+
+---
+
+### 2️⃣ Configurable Web Runtime
+
+The web application itself is **stable and minimal**:
+
+* HTML renders dynamic UI
+* JavaScript connectors call APIs
+* No business logic is hard-coded
+
+All behavior is driven by configuration delivered from Postman.
+
+---
+
+### 3️⃣ Workflow-as-JSON Engine
+
+Every request flows through a **JSON-defined workflow** that:
+
+* Validates inputs
+* Routes based on tenant or rules
+* Transforms and enriches payloads
+* Orchestrates one or more backend APIs
+* Applies retries, fallbacks, and async handling
+* Returns a **UI-ready response**
+
+---
+
+### 4️⃣ Backend APIs
+
+Workflows can integrate with:
+
+* Internal core systems
+* External partner APIs
+* Data and workflow services
+
+All orchestration is centralized and governed.
+
+---
+
+### 5️⃣ Observability & Governance
+
+Each workflow execution emits:
+
+* Logs for troubleshooting
+* Metrics for performance and success rates
+* Traces for end-to-end visibility
+* Audit records for versioning and compliance
+
+---
+
+## One-Line Diagram Caption (Marketing Use)
+
+**A Postman-controlled platform where UI, API connectors, and workflows evolve through configuration—without redeploying applications.**
+
+---
+
+If you want next, I can:
+
+* Create a **sequence diagram** (step-by-step request lifecycle)
+* Provide a **multi-tenant variant** with per-client routing highlighted
+* Add an **Azure-mapped version** (Functions, APIM, App Insights)
+
+Just tell me how deep you want to go.
