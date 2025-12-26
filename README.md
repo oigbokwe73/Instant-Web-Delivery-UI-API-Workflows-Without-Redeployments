@@ -2,7 +2,6 @@
 Deliver configurable, API-driven web experiences that evolve through configuration—not code. This project shows how Postman and JSON workflows enable instant UI updates, dynamic routing, and enterprise-ready governance across tenants and environments.
 
 
-Here’s marketing-ready copy you can use to describe the feature (Postman-driven HTML/JS page creation + API connector + JSON workflow for routing/orchestration). I’m writing it so it can drop into a website, deck, or one-pager.
 
 ## Feature name ideas
 
